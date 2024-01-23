@@ -66,18 +66,28 @@ end
 adaptorInPins = cell2mat(values(adaptorInMap,headstage2adaptor));
 
 % Probe channels viewed from the adaptor
-[~, probeCh, probeOutConf] = probeAcute32Map_ch2ind;
+if strcmp(probe, 'A16-CambridgeNeuroTech')
+  [~, probeCh, probeOutConf] = probeAcute16Map_ch2ind;
+else
+  [~, probeCh, probeOutConf] = probeAcute32Map_ch2ind;
+end
 probeCh = fliplr(probeCh);
 
 % Transformation
 headstage2probe = num2cell(probeCh(adaptorInPins));
+redundantChans = ismember(cell2mat(headstage2probe),0);
+if ~isempty(redundantChans)
+  realChans = ~redundantChans;
+else
+  realChans = true(size(headstage2probe));
+end
 
 
 % HEADSTAGE TO COORDINATES
 if strcmp(probe, 'A32-A1x32-Edge-5mm-20-177')
   [channelMap, ~, probeInConf] = A32_A1x32_Edge_5mm_20_177_probeMap();
 elseif strcmp(probe, 'A32-A1x32-5mm-25-177')
-  [channelMap, ~, probeInConf] = A32_A1x32_Edge_25_177_probeMap();
+  [channelMap, ~, probeInConf] = A32_A1x32_5mm_25_177_probeMap();
 elseif strcmp(probe, 'A32-Buzsaki32-5mm-BUZ-200-160')
   [channelMap, ~, probeInConf] = A32_Buzsaki32_5mm_BUZ_200_160_probeMap();
 elseif strcmp(probe, 'A32-A1x32-Poly3-5mm-25s-177')
@@ -85,8 +95,10 @@ elseif strcmp(probe, 'A32-A1x32-Poly3-5mm-25s-177')
   probeInConf.probe = 'A32-A1x32-Poly3-5mm-25s-177';
 elseif strcmp(probe, 'A32-A1x32-Poly3-10mm-50-177')
   [channelMap, ~, probeInConf] = A32_A1x32_Poly3_10mm_50_177_probeMap();
+elseif strcmp(probe, 'A16-CambridgeNeuroTech')
+  [channelMap, ~, probeInConf] = A16_CambridgeNeuroTech_probeMap();
 end
-chCoords = cell2mat(values(channelMap,headstage2probe));
+chCoords = cell2mat(values(channelMap,headstage2probe(realChans)));
 
 
 % CORRECTED HEADSTAGE CHANNEL ORDER
@@ -121,7 +133,8 @@ if strcmp(probe, 'A32-Buzsaki32-5mm-BUZ-200-160')
 
   sortedInd = [sortedIndSh1; sortedIndSh2; sortedIndSh3; sortedIndSh4];
   chCoords = [chCoordsSh1; chCoordsSh2; chCoordsSh3; chCoordsSh4];
-elseif strcmp(probe, 'A32-A1x32-Poly3-5mm-25s-177') || strcmp(probe, 'A32-A1x32-Poly3-10mm-50-177')
+elseif strcmp(probe, 'A32-A1x32-Poly3-5mm-25s-177') || strcmp(probe, 'A32-A1x32-Poly3-10mm-50-177') ||...
+    strcmp(probe, 'A16-CambridgeNeuroTech')
   chCoords = [chCoords(1:2:length(chCoords))' chCoords(2:2:length(chCoords))'];
   [~, sortedInd1] = sort(chCoords(:,1),'ascend');
   chCoords = chCoords(sortedInd1,:);
@@ -133,7 +146,7 @@ else
   chCoords = chCoords(sortedInd)';
 end
 
-headstageCh = cell2mat(headstageCh);
+headstageCh = cell2mat(headstageCh(realChans));
 correctedCh = headstageCh(sortedInd);
 correctedChAbs = 1:numel(headstageCh);
 correctedChAbs = correctedChAbs(sortedInd);

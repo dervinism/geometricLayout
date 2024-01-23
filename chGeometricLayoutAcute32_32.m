@@ -29,7 +29,11 @@ headstage2adaptor = num2cell(adaptorOutCh(headstagePins));
 adaptorInPins = cell2mat(values(adaptorInMap,headstage2adaptor));
 
 % Probe channels viewed from the adaptor
-[~, probeCh, probeOutConf] = probeAcute32Map_ch2ind;
+if strcmp(probe, 'A16-CambridgeNeuroTech')
+  [~, probeCh, probeOutConf] = probeAcute16Map_ch2ind;
+else
+  [~, probeCh, probeOutConf] = probeAcute32Map_ch2ind;
+end
 probeCh = fliplr(probeCh);
 
 % Transformation
@@ -48,6 +52,8 @@ elseif strcmp(probe, 'A32-A1x32-Poly3-5mm-25s-177')
   probeInConf.probe = 'A32-A1x32-Poly3-5mm-25s-177';
 elseif strcmp(probe, 'A32-A1x32-Poly3-10mm-50-177')
   [channelMap, ~, probeInConf] = A32_A1x32_Poly3_10mm_50_177_probeMap();
+elseif strcmp(probe, 'A16-CambridgeNeuroTech')
+  [channelMap, ~, probeInConf] = A16_CambridgeNeuroTech_probeMap();
 end
 chCoords = cell2mat(values(channelMap,headstage2probe));
 

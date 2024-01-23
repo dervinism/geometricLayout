@@ -1,24 +1,30 @@
- function outputFilename = writeBinary(data, fileName, format)
+function outputFilename = writeBinary(data, fileName)
 % The function writes a short binary file.
 %
 % Input: data is the data vector to write.
 %        fileName is the name of the binary file when saved.
-%        format is the saved data format (i.e., 'int16', 'double', etc).
-%           Default is 'int16'.
 %
 % Output: outputFilename is the name of the binary file when saved.
 
-if nargin < 3
-    format = 'int16';
-end
-
 chunkSize = 1000000;
-data = int16(data);
 
 fidOut = [];
 
 w = whos('data');
-nSampsTotal = w.bytes/2;
+format = w.class;
+if strcmp(format, 'int8') || strcmp(format, 'uint8')
+  nSampsTotal = format;
+elseif strcmp(format, 'int16') || strcmp(format, 'uint16')
+  nSampsTotal = w.bytes/2;
+elseif strcmp(format, 'int32') || strcmp(format, 'uint32') || strcmp(format, 'single')
+  nSampsTotal = w.bytes/4;
+elseif strcmp(format, 'int64') || strcmp(format, 'uint64') || strcmp(format, 'double')
+  nSampsTotal = w.bytes/8;
+else
+  error(['Unsupported data format. '...
+    'Supported formats are double, single, int8, int16, int32, int64, uint8, uint16, uint32, uint64']);
+end
+  
 nChunksTotal = ceil(nSampsTotal/chunkSize);
 
 try
@@ -34,7 +40,7 @@ try
     elseif inds(end) > numel(data)
       inds = inds(1):numel(data);
     end
-    dat = int16(data(inds));
+    dat = data(inds);
     fwrite(fidOut, dat, format);
     chunkInd = chunkInd+1;
   end

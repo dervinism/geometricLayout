@@ -22,7 +22,8 @@ function [channelMedian, medianTrace, nChansTotal, probeConfFile, outputFilename
 %          CM16LP-A1x16-Poly2-5mm-50s-177, CM16-A1x16-5mm-25-177,
 %          CM32-A32-Poly2-5mm-50s-177, CM32-A32-Poly3-5mm-25s-177,
 %          CM32-A1x32-6mm-100-177, CM32-A1x32-Edge-5mm-100-177,
-%          H32-A1x32-Edge-5mm-20-177, and H32-Buzsaki32-5mm-BUZ-200-160.
+%          H32-A1x32-Edge-5mm-20-177, H32-Buzsaki32-5mm-BUZ-200-160, and
+%          A16-CambridgeNeuroTech.
 %        probeFlip - a logical that is true if the probe was connected
 %          to the headstage upside-down during the recording session (the
 %          labels on the headstage and probe connectors facing opposite
@@ -75,7 +76,7 @@ if strcmp(probe, 'Neuropixels')
   [~, swapOrder, probe2headstageConf, nChans] = chGeometricLayoutNeuropixels;
 elseif strcmpi(probe(1:3), 'A64')
   [~, swapOrder, probe2headstageConf, nChans] = chGeometricLayoutAcute64(probe, probeFlip);
-elseif strcmpi(probe(1:3), 'A32')
+elseif strcmpi(probe(1:3), 'A32') || strcmpi(probe(1:3), 'A16')
   if strcmpi(headstage, 'RHD2164_top')
     [~, swapOrder, probe2headstageConf, nChans] = chGeometricLayoutAcute32_64(probe, false, 'top');
   elseif strcmpi(headstage, 'RHD2164_bottom')
